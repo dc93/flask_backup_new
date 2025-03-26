@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Configurazione Backup{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-plus me-2"></i>Aggiungi Configurazione</h1>
+    <a href="{{ url_for('main.configs') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i>Torna alle Configurazioni
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="post" novalidate>
+            {{ form.hidden_tag() }}
+            
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h4>Informazioni Base</h4>
+                    <hr>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        {{ form.name.label(class="form-label") }}
+                        {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else "")) }}
+                        {% if form.name.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.name.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        {{ form.compression_level.label(class="form-label") }}
+                        {{ form.compression_level(class="form-control" + (" is-invalid" if form.compression_level.errors else ""), min=0, max=9) }}
+                        {% if form.compression_level.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.compression_level.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <div class="form-text">0 (no compressione) a 9 (massima compressione)</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        {{ form.source_path.label(class="form-label") }}
+                        {{ form.source_path(class="form-control" + (" is-invalid" if form.source_path.errors else "")) }}
+                        {% if form.source_path.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.source_path.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <div class="form-text">Percorso assoluto della cartella da cui eseguire il backup</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        {{ form.destination_path.label(class="form-label") }}
+                        {{ form.destination_path(class="form-control" + (" is-invalid" if form.destination_path.errors else "")) }}
+                        {% if form.destination_path.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.destination_path.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <div class="form-text">Percorso assoluto dove verranno archiviati i backup</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-12 mb-3">
+                    <div class="form-check">
+                        {{ form.incremental(class="form-check-input") }}
+                        {{ form.incremental.label(class="form-check-label") }}
+                        <div class="form-text">Esegui il backup solo dei file modificati dall'ultimo backup</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h4>Programmazione</h4>
+                    <hr>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        {{ form.schedule_type.label(class="form-label") }}
+                        {{ form.schedule_type(class="form-select" + (" is-invalid" if form.schedule_type.errors else "")) }}
+                        {% if form.schedule_type.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.schedule_type.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        {{ form.schedule_time.label(class="form-label") }}
+                        {{ form.schedule_time(class="form-control" + (" is-invalid" if form.schedule_time.errors else "")) }}
+                        {% if form.schedule_time.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.schedule_time.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-md-12 mb-3">
+                    <div class="form-group">
+                        {{ form.schedule_days.label(class="form-label") }}
+                        {{ form.schedule_days(class="form-control" + (" is-invalid" if form.schedule_days.errors else "")) }}
+                        {% if form.schedule_days.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.schedule_days.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <div class="form-text">Per backup settimanali, elenco di giorni separati da virgola (es. monday,wednesday,friday)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{{ url_for('main.configs') }}" class="btn btn-outline-secondary me-md-2">Annulla</a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i>Salva Configurazione
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mostra/nascondi campi in base alla selezione
+        const scheduleType = document.getElementById('schedule_type');
+        const scheduleTime = document.getElementById('schedule_time').parentNode.parentNode;
+        const scheduleDays = document.getElementById('schedule_days').parentNode.parentNode;
+        
+        function updateScheduleFields() {
+            if (scheduleType.value === 'manual') {
+                scheduleTime.style.display = 'none';
+                scheduleDays.style.display = 'none';
+            } else {
+                scheduleTime.style.display = '';
+                
+                if (scheduleType.value === 'weekly') {
+                    scheduleDays.style.display = '';
+                } else {
+                    scheduleDays.style.display = 'none';
+                }
+            }
+        }
+        
+        // Aggiornamento iniziale
+        updateScheduleFields();
+        
+        // Aggiungi event listener
+        scheduleType.addEventListener('change', updateScheduleFields);
+    });
+</script>
+{% endblock %}

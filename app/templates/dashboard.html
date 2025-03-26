@@ -1,0 +1,188 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Dashboard - Sistema di Backup{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</h1>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 bg-primary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-white-50">Configurazioni Totali</h6>
+                        <h2 class="mb-0">{{ stats.total_configs }}</h2>
+                    </div>
+                    <div>
+                        <i class="fas fa-cogs fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 bg-success text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-white-50">Backup Riusciti</h6>
+                        <h2 class="mb-0">{{ stats.successful_backups }}</h2>
+                    </div>
+                    <div>
+                        <i class="fas fa-check-circle fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 bg-danger text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-white-50">Backup Falliti</h6>
+                        <h2 class="mb-0">{{ stats.failed_backups }}</h2>
+                    </div>
+                    <div>
+                        <i class="fas fa-times-circle fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Backup Configurations -->
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Configurazioni Backup</h5>
+                    <a href="{{ url_for('main.add_config') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus me-1"></i>Aggiungi Nuova
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                {% if configs %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nome</th>
+                                <th>Pianificazione</th>
+                                <th>Stato</th>
+                                <th>Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for config in configs %}
+                            <tr>
+                                <td>{{ config.name }}</td>
+                                <td>
+                                    {% if config.schedule_type == 'manual' %}
+                                    <span class="badge bg-secondary">Solo Manuale</span>
+                                    {% elif config.schedule_type == 'daily' %}
+                                    <span class="badge bg-info">Giornaliero</span>
+                                    {% elif config.schedule_type == 'weekly' %}
+                                    <span class="badge bg-primary">Settimanale</span>
+                                    {% elif config.schedule_type == 'monthly' %}
+                                    <span class="badge bg-warning">Mensile</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if config.active %}
+                                    <span class="badge bg-success">Attivo</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Inattivo</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <form method="post" action="{{ url_for('main.start_backup', config_id=config.id) }}">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                            <button type="submit" class="btn btn-outline-primary">
+                                                <i class="fas fa-play"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <p class="text-muted mb-0">Nessuna configurazione di backup trovata.</p>
+                    <p>
+                        <a href="{{ url_for('main.add_config') }}" class="btn btn-primary mt-2">
+                            <i class="fas fa-plus me-1"></i>Aggiungi La Tua Prima Configurazione
+                        </a>
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Backup Logs -->
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>Log Backup Recenti</h5>
+                    <a href="{{ url_for('main.logs') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-eye me-1"></i>Vedi Tutti
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_logs %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Config</th>
+                                <th>Stato</th>
+                                <th>Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in recent_logs %}
+                            <tr>
+                                <td>{{ log.config.name if log.config else 'Sconosciuto' }}</td>
+                                <td>
+                                    {% if log.status == 'success' %}
+                                    <span class="badge bg-success">Successo</span>
+                                    {% elif log.status == 'error' %}
+                                    <span class="badge bg-danger">Errore</span>
+                                    {% elif log.status == 'running' %}
+                                    <span class="badge bg-primary">In esecuzione</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ log.status|capitalize }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ log.start_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <p class="text-muted">Nessun log di backup trovato.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

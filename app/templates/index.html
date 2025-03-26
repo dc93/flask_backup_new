@@ -1,0 +1,41 @@
+﻿{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card border-0 shadow-lg">
+            <div class="card-body p-5">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h1 class="display-4 fw-bold mb-4">Sistema di Backup</h1>
+                        <p class="lead">Una soluzione completa per gestire i tuoi backup con facilitÃ .</p>
+                        <p class="mb-4">Il nostro sistema di backup offre un'interfaccia web intuitiva per configurare, monitorare e gestire i tuoi backup. Con funzionalitÃ  come pianificazione e compressione, puoi garantire che i tuoi dati siano sempre al sicuro.</p>
+                        
+                        <div class="mb-4">
+                            <h5><i class="fas fa-check-circle text-success me-2"></i>FunzionalitÃ  Principali</h5>
+                            <ul class="list-unstyled ms-4">
+                                <li><i class="fas fa-angle-right me-2"></i>Backup automatici pianificati</li>
+                                <li><i class="fas fa-angle-right me-2"></i>Monitoraggio in tempo reale</li>
+                                <li><i class="fas fa-angle-right me-2"></i>Supporto backup incrementali</li>
+                                <li><i class="fas fa-angle-right me-2"></i>Compressione dei file</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex">
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg me-md-2">
+                                <i class="fas fa-user-plus me-2"></i>Registrati ora
+                            </a>
+                            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Accedi
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-center">
+                        <img src="https://via.placeholder.com/500x300?text=Backup+System" alt="Backup System" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

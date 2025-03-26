@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Configurazioni Backup{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-cogs me-2"></i>Configurazioni Backup</h1>
+    <a href="{{ url_for('main.add_config') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i>Aggiungi Nuova Configurazione
+    </a>
+</div>
+
+{% if configs %}
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Sorgente</th>
+                        <th>Destinazione</th>
+                        <th>Programmazione</th>
+                        <th>Funzioni</th>
+                        <th>Stato</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for config in configs %}
+                    <tr>
+                        <td>{{ config.name }}</td>
+                        <td class="text-truncate" style="max-width: 150px;" title="{{ config.source_path }}">
+                            {{ config.source_path }}
+                        </td>
+                        <td class="text-truncate" style="max-width: 150px;" title="{{ config.destination_path }}">
+                            {{ config.destination_path }}
+                        </td>
+                        <td>
+                            {% if config.schedule_type == 'manual' %}
+                            <span class="badge bg-secondary">Solo Manuale</span>
+                            {% elif config.schedule_type == 'daily' %}
+                            <span class="badge bg-info">Giornaliero</span>
+                            {% if config.schedule_time %}
+                            <small>{{ config.schedule_time.strftime('%H:%M') }}</small>
+                            {% endif %}
+                            {% elif config.schedule_type == 'weekly' %}
+                            <span class="badge bg-primary">Settimanale</span>
+                            {% if config.schedule_time %}
+                            <small>{{ config.schedule_time.strftime('%H:%M') }}</small>
+                            {% endif %}
+                            {% elif config.schedule_type == 'monthly' %}
+                            <span class="badge bg-warning">Mensile</span>
+                            {% if config.schedule_time %}
+                            <small>{{ config.schedule_time.strftime('%H:%M') }}</small>
+                            {% endif %}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if config.incremental %}
+                            <span class="badge bg-success">Incrementale</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if config.active %}
+                            <span class="badge bg-success">Attivo</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inattivo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="post" action="{{ url_for('main.start_backup', config_id=config.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-play"></i> Avvia
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card shadow-sm">
+    <div class="card-body text-center py-5">
+        <div class="mb-4">
+            <i class="fas fa-folder-open text-muted fa-4x"></i>
+        </div>
+        <h4>Nessuna Configurazione di Backup Trovata</h4>
+        <p class="text-muted">Non hai ancora creato configurazioni di backup.</p>
+        <a href="{{ url_for('main.add_config') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>Crea La Tua Prima Configurazione
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
